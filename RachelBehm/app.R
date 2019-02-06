@@ -4,30 +4,32 @@ library(shinythemes)
 library(RColorBrewer)
 
 # get da data
-oph <- read_csv("AllOphioninaeEntries.csv") 
+bug <- read_csv("asof252019.csv") 
+#wrangle the data
+bugsimple<- bug %>% 
+  select(order, year, country, stateProvince, county)
 
-oph$genus[is.na(oph$genus)] <- "Not Specified"
 
 #create user interface
 ui<- fluidPage(
   
   theme = shinytheme("slate"),
-  titlePanel("Coastal Southern California Counties"),
+  titlePanel("Exploring the UCSB Invertebrate Zoology Collection"),
   sidebarLayout(
     sidebarPanel(
-      radioButtons("county",
-                   "Choose a county",
-                   c("San Diego",
-                     "Orange",
-                     "Los Angeles",
-                     "Riverside",
-                     "San Bernardino",
-                     "Ventura",
-                     "Santa Barbara"
+      radioButtons("order",
+                   "Choose an order",
+                   c("Coleoptera",
+                     "Diptera",
+                     "Hemiptera",
+                     "Hymenoptera",
+                     "Lepidoptera",
+                     "Odonata",
+                     "Orthoptera"
                      ))
     ),
     mainPanel(
-      plotOutput(outputId ="ophplot")
+      plotOutput(outputId ="bugplot")
     )
   )
   
@@ -36,11 +38,11 @@ ui<- fluidPage(
 
 server<- function(input, output) {
   
-  output$ophplot<- renderPlot({
+  output$bugplot<- renderPlot({
     
-    ggplot(filter(oph, county== input$county), aes(x=year))+
-      geom_bar(aes(fill=genus), position= "fill")+
-      theme_dark()
+    ggplot(bugsimple, aes(x=year)) +
+      geom_bar(aes(fill=order), position= "fill")+
+      theme_dark() + scale_x_continuous()
   })
   
 }
