@@ -9,7 +9,29 @@ bug <- read_csv("asof252019.csv")
 bugsimple<- bug %>% 
   select(order, year, country, stateProvince, county) %>%
   filter(order != "N/A") %>%
-  filter(year >= 1800)
+  filter(year >= 1919)
+
+#now lets try to make one for each order so can call them seperately for the graphs
+Diptera <- bugsimple %>%
+  filter(order == "Diptera")
+Coleoptera<- bugsimple %>%
+  filter(order == "Coleoptera")
+Hemiptera<- bugsimple %>%
+  filter(order == "Hemiptera")
+Hymenoptera <-bugsimple %>%
+  filter(order == "Hymenoptera")
+Lepidoptera<- bugsimple %>%
+  filter(order == "Lepidoptera")
+Odonata <- bugsimple %>%
+  filter(order == "Odonata")
+Orthoptera <- bugsimple %>%
+  filter(order == "Orthoptera")
+Trichoptera<- bugsimple %>%
+  filter(order == "Trichoptera")
+
+
+
+
 
 
 #create user interface
@@ -42,7 +64,8 @@ ui<- fluidPage(
                                 "Hymenoptera",
                                 "Lepidoptera",
                                 "Odonata",
-                                "Orthoptera"
+                                "Orthoptera",
+                                "Trichoptera"
                               ))
                ),
                mainPanel(
@@ -57,9 +80,9 @@ ui<- fluidPage(
     
     output$bugplot<- renderPlot({
       
-      ggplot(bugsimple, aes(x=year)) +
-        geom_bar(aes(fill=order), position= "fill")+
-        theme_bw()
+      ggplot(data = input$radioButtons, aes(x = year)) +
+        geom_histogram(aes(fill=order))+
+        theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Aquisitions in the Last 100 Years (1919-2019")
     })
     
   }
