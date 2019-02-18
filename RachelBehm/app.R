@@ -7,7 +7,9 @@ library(RColorBrewer)
 bug <- read_csv("asof252019.csv") 
 #wrangle the data
 bugsimple<- bug %>% 
-  select(order, year, country, stateProvince, county)
+  select(order, year, country, stateProvince, county) %>%
+  filter(order != "N/A") %>%
+  filter(year >= 1800)
 
 
 #create user interface
@@ -57,7 +59,7 @@ ui<- fluidPage(
       
       ggplot(bugsimple, aes(x=year)) +
         geom_bar(aes(fill=order), position= "fill")+
-        theme_dark() + scale_x_continuous()
+        theme_bw()
     })
     
   }
