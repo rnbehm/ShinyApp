@@ -13,40 +13,93 @@ bugsimple<- bug %>%
 #create user interface
 ui<- fluidPage(
   
-  theme = shinytheme("slate"),
+  theme = shinytheme("cerulean"),
   titlePanel("Exploring the UCSB Invertebrate Zoology Collection"),
-  sidebarLayout(
-    sidebarPanel(
-      radioButtons("order",
-                   "Choose an order",
-                   c("Coleoptera",
-                     "Diptera",
-                     "Hemiptera",
-                     "Hymenoptera",
-                     "Lepidoptera",
-                     "Odonata",
-                     "Orthoptera"
-                     ))
-    ),
-    mainPanel(
-      plotOutput(outputId ="bugplot")
-    )
-  )
+  navbarPage("UCSB IZC",
+             #this tab only has text
+             tabPanel("Summary of the App",
+                      h1("The purpose of this App"),
+                      h2("Uses of this app"),
+                      p("paragraph 1"),
+                      p("paragraph 2"),
+                      h1("Then another header"),
+                      p("paragraph3")
+                      
+             ),
+             #histogram panel- like what you wanna do 
+             #the histogram is made in the server code and called in this code
+             tabPanel("Exploration",
+                      
+             sidebarLayout(
+               sidebarPanel(
+                 radioButtons("order",
+                              "Choose an order",
+                              c("Coleoptera",
+                                "Diptera",
+                                "Hemiptera",
+                                "Hymenoptera",
+                                "Lepidoptera",
+                                "Odonata",
+                                "Orthoptera"
+                              ))
+               ),
+               mainPanel(
+                 plotOutput(outputId ="bugplot")
+               )
+             ))))
+             
+             
   
   
-)
-
-server<- function(input, output) {
-  
-  output$bugplot<- renderPlot({
+  server<- function(input, output) {
     
-    ggplot(bugsimple, aes(x=year)) +
-      geom_bar(aes(fill=order), position= "fill")+
-      theme_dark() + scale_x_continuous()
-  })
+    output$bugplot<- renderPlot({
+      
+      ggplot(bugsimple, aes(x=year)) +
+        geom_bar(aes(fill=order), position= "fill")+
+        theme_dark() + scale_x_continuous()
+    })
+    
+  }
   
-}
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ 
 
 
 
