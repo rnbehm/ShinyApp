@@ -11,8 +11,11 @@ bugsimple<- bug %>%
   filter(order != "N/A") %>%
   filter(year >= 1919)
 
+
+
 #now lets try to make one for each order so can call them seperately for the graphs
-Diptera <- bugsimple %>%
+
+Diptera<- bugsimple %>%
   filter(order == "Diptera")
 Coleoptera<- bugsimple %>%
   filter(order == "Coleoptera")
@@ -82,9 +85,42 @@ ui<- fluidPage(
   
   server<- function(input, output) {
     
-    output$bugplot<- renderPlot({
+    category <- bugsimple$order
+    yearv <- bugsimple$year
+    catyear<- data.frame(category,yearv)
+    df_subset <- reactive({
+      a <- subset(catyear, category == input$order)
+      return(a)
+    })
+    
+    if (input$order == "Diptera"){
+      df<- Diptera
+    }
+    else if(input$order == "Coleoptera"){
+      df<- Coleoptera
+    }
+    else if(input$order == "Hemiptera"){
+      df <- Hymenoptera
+    }
+    else if(input$order == "Lepidoptera")
+    {df <- Lepidoptera
+    }
+    else if(input$order == "Odonata")
+    {df <- Odonata
+    }
+    else if(input$order == "Orthoptera")
+    {df<- Orthoptera
+    }
+    else if(input$order == "Trichoptera")
+    {df<-Trichoptera
+    }
+    
+    
+
+    
+    output$bugplot<- renderPlot(
       
-      ggplot(data = input$radioButtons, aes(x = year)) +
+      ggplot(df_subset, aes(x = year)) +
         geom_histogram(aes(fill=order))+
         theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Aquisitions in the Last 100 Years (1919-2019")
     })
@@ -92,29 +128,6 @@ ui<- fluidPage(
   }
   
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-  
-  
   
   
   
