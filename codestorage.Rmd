@@ -1,3 +1,13 @@
+---
+title: "codeholder"
+author: "Rachel Behm"
+date: "February 23, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 library(shiny)
 library(tidyverse)
@@ -53,72 +63,95 @@ ui<- fluidPage(
                       p("The historic collection had out-of-date identifications, if any, and were coarsely organized by family. Thanks to funding from the Institute of Museum and Library Services (IMLS) and the UCSB Coastal Fund, new drawers and unit trays were purchased,  nomenclature was coarsely updated, and specimen determinations re-examined. Specimen are determined to the lowest rank possible with a focus on bees, ants, tiger beetles, and dune insects."),
                       p("Starting in April 2017, databasing the specimens began. Specimens were given a barcode that acts as a unique identifier for the specimen. Once imaged, the photo is colorcorrected, cropped, and renamed using a custom Gimp python plugin called BugFlipper, and bulk-uploaded into our Symbiota data portal."),
                       h1("Purpose of this App")
-             ),
-             
+                      ),
+                      
              
              #histogram panel- like what you wanna do 
              #the histogram is made in the server code and called in this code
              tabPanel("Exploration",
                       
-                      sidebarLayout(
-                        sidebarPanel(
-                          radioButtons("order",
-                                       "Choose an order",
-                                       c("Coleoptera",
-                                         "Diptera",
-                                         "Hemiptera",
-                                         "Hymenoptera",
-                                         "Lepidoptera",
-                                         "Odonata",
-                                         "Orthoptera",
-                                         "Trichoptera"
-                                       ))
-                        ),
-                        mainPanel(
-                          plotOutput(outputId ="bugplot")
-                        )
-                      ))))
+             sidebarLayout(
+               sidebarPanel(
+                 radioButtons("order",
+                              "Choose an order",
+                              c("Coleoptera",
+                                "Diptera",
+                                "Hemiptera",
+                                "Hymenoptera",
+                                "Lepidoptera",
+                                "Odonata",
+                                "Orthoptera",
+                                "Trichoptera"
+                              ))
+               ),
+               mainPanel(
+                 plotOutput(outputId ="bugplot")
+               )
+             ))))
+             
+             
+  
+  
+  server<- function(input, output) {
 
+    
+    category <- bugsimple$order
+    yearv <- bugsimple$year
+    catyear<- data.frame(category,yearv)
+    df_subset <- reactive({
+      a <- subset(catyear, category == input$order)
+      return(a)
+    })
+    
+    if (input$order == "Diptera"){
+      df<- Diptera
+    }
+    else if(input$order == "Coleoptera"){
+      df<- Coleoptera
+    }
+    else if(input$order == "Hemiptera"){
+      df <- Hymenoptera
+    }
+    else if(input$order == "Lepidoptera")
+    {df <- Lepidoptera
+    }
+    else if(input$order == "Odonata")
+    {df <- Odonata
+    }
+    else if(input$order == "Orthoptera")
+    {df<- Orthoptera
+    }
+    else if(input$order == "Trichoptera")
+    {df<-Trichoptera
+    }
+    
+    
 
+    
+    output$bugplot<- renderPlot({
+      
+      ggplot(df_subset, aes(x = year)) +
+        geom_histogram(aes(fill=order))+
+        theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Aquisitions in the Last 100 Years (1919-2019")
+    })
+    
+  }
+  
 
-
-server<- function(input, output) {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
  
-  
-  
-  
-  # Define server logic required to draw a histogram
-  output$bugplot<- renderPlot({
-    
-    # Creating the reactive output
-    bugs_hist <- bugsimple %>% 
-      filter(order == input$order) # Filter based on input selection from height widget
-    
-    #now create the graph
-    ggplot(bugs_hist, aes(x = year)) +
-      geom_histogram(aes(fill=order))+
-      theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Aquisitions in the Last 100 Years (1919-2019")
-  })
-  
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
