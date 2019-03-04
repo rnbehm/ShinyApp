@@ -1,0 +1,93 @@
+---
+title: "izcdatabase"
+author: "Rachel Behm"
+date: "February 27, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(forcats)
+```
+
+```{r}
+# get da data
+izc <- read_csv("asof252019.csv") 
+#wrangle the data
+bugsimple<- izc %>% 
+  select(order, family, scientificName, year, month, eventDate, verbatimEventDate, samplingProtocol, habitat, country, stateProvince, county, municipality, decimalLatitude, decimalLongitude, recordedBy) %>%
+  filter(order != "N/A") %>%
+  filter(year >= 1919)
+```
+
+```{r}
+
+Diptera<- bugsimple %>%
+  filter(order == "Diptera")
+Coleoptera<- bugsimple %>%
+  filter(order == "Coleoptera")
+Hemiptera<- bugsimple %>%
+  filter(order == "Hemiptera")
+Hymenoptera <-bugsimple %>%
+  filter(order == "Hymenoptera")
+Lepidoptera<- bugsimple %>%
+  filter(order == "Lepidoptera")
+Odonata <- bugsimple %>%
+  filter(order == "Odonata")
+Orthoptera <- bugsimple %>%
+  filter(order == "Orthoptera")
+Trichoptera<- bugsimple %>%
+  filter(order == "Trichoptera")
+#########################################################################################
+#for california
+bugcal <- bugsimple %>%
+  filter(stateProvince == "California")
+#########################################################################################
+bugsbco<- bugsimple %>%
+  filter(county == "Santa Barbara")
+```
+
+```{r}
+ggplot(bugsimple, aes(x = year)) +
+    geom_histogram(fill="lightskyblue")+
+    theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
+
+#########################################################################################
+
+
+ggplot(mutate(bugsimple, order = fct_infreq(order))) +
+    geom_bar(aes(x= order, fill = order))+
+    theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") +
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.background = element_rect(fill = "white", color= "black")
+        )
+#########################################################################################
+
+ggplot(bugcal, aes(x = county)) +
+    geom_bar(aes(fill=county))+
+    theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") +
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.background = element_rect(fill = "white", color= "black")
+        )
+#all of the counties are effed up but thats a database problem
+##########################################################################################
+
+ggplot(mutate(bugsbco, family = fct_infreq(family))) +
+    geom_bar(aes(x= family, fill = order))+
+    theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") +
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.background = element_rect(fill = "white", color= "black")
+        )
+
+```
+

@@ -2,6 +2,9 @@
 library(shiny)
 library(tidyverse)
 library(shinythemes)
+library(leaflet)
+library(sf)
+library(tmap)
 
 # get da data
 bug <- read_csv("asof252019.csv") 
@@ -11,30 +14,9 @@ bugsimple<- bug %>%
   filter(order != "N/A") %>%
   filter(year >= 1919)
 
-
-#now lets try to make one for each order so can call them seperately for the graphs
-
-Diptera<- bugsimple %>%
-  filter(order == "Diptera")
-Coleoptera<- bugsimple %>%
-  filter(order == "Coleoptera")
-Hemiptera<- bugsimple %>%
-  filter(order == "Hemiptera")
-Hymenoptera <-bugsimple %>%
-  filter(order == "Hymenoptera")
-Lepidoptera<- bugsimple %>%
-  filter(order == "Lepidoptera")
-Odonata <- bugsimple %>%
-  filter(order == "Odonata")
-Orthoptera <- bugsimple %>%
-  filter(order == "Orthoptera")
-Trichoptera<- bugsimple %>%
-  filter(order == "Trichoptera")
-
-
-
-
-
+#wanted to check to make sure its numeric and yes it is
+#bugsimple$year = as.numeric(bugsimple$year)
+################################################################################################################################3
 
 #create user interface
 ui<- fluidPage(
@@ -54,11 +36,11 @@ ui<- fluidPage(
                       p("Starting in April 2017, databasing the specimens began. Specimens were given a barcode that acts as a unique identifier for the specimen. Once imaged, the photo is colorcorrected, cropped, and renamed using a custom Gimp python plugin called BugFlipper, and bulk-uploaded into our Symbiota data portal."),
                       h1("Purpose of this App")
              ),
-             
+###############################################################################################################################################             
              
              #histogram panel- like what you wanna do 
              #the histogram is made in the server code and called in this code
-             tabPanel("Exploration",
+             tabPanel("Taxonomic Representation",
                       
                       sidebarLayout(
                         sidebarPanel(
@@ -75,20 +57,42 @@ ui<- fluidPage(
                                        ))
                         ),
                         mainPanel(
-                          plotOutput(outputId ="bugplot")
+                          plotOutput(
+                            outputId ="bugplot")
                         )
-                      ))))
+                      )),
+  ##################################################################################################################################################           
+             #this is how you start a new tab
+             tabPanel("Specimen Records Through Time",
+                      
+                      # Sidebar with a slider input for number of bins 
+                      sidebarLayout(
+                        sidebarPanel(
+                          
+                          radioButtons("histyear", 
+                                       "Select histogram year:",
+                                       choices = c("1919","1929","1939", "1949", "1959", "1969", "1979", "1989", "1999", "2009","2019"))
+                        ),
+                        
+                        # Show a plot of the generated distribution
+                        mainPanel(
+                          plotOutput("hist")
+                        )
+                      ))
+###########################################################################################################################################             
+  )
+  
+)
+
+                        
 
 
 
 
 server<- function(input, output) {
   
-  
+  output$hist<- renderPlot({
  
-  
-  
-  
   # Define server logic required to draw a histogram
   output$bugplot<- renderPlot({
     
@@ -98,9 +102,29 @@ server<- function(input, output) {
     
     #now create the graph
     ggplot(bugs_hist, aes(x = year)) +
-      geom_histogram(aes(fill=order))+
-      theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Aquisitions in the Last 100 Years (1919-2019")
+      geom_histogram(fill="lightskyblue")+
+      theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
   })
+  
+  
+  year_hist <- bugsimple %>%
+    filter(year <= input$year)    
+  
+  #ggplot(year_hist, aes(x = order)) +
+  #geom_histogram(fill= "blue")+
+  #theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
+  
+  ggplot(mutate(year_hist, order = fct_infreq(order))) +
+    geom_bar(aes(x= order, fill = order))+
+    theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") +
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          panel.background = element_rect(fill = "white", color= "black")
+    )
+  
+  })
+  
   
 }
 

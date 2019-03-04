@@ -145,12 +145,29 @@ ui<- fluidPage(
   
   
   
+   
+                      sidebarLayout(
+                        sidebarPanel(
+                          sliderInput("year",
+                                      "Year Collected:",
+                                      min = 1919,
+                                      max = 2019,
+                                      value = 0)
+                          
+                        ),
+                        
+                        # Show a plot of the generated distribution
+                        #mainPanel(
+                         # leafletOutput("allbug")
   
   
   
   
   
-  
+```{r}
+year_hist <- bugsimple %>% 
+      filter(year <= input$year) 
+```
  
 
 
