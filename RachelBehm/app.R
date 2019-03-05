@@ -44,7 +44,7 @@ ui<- fluidPage(
              #histogram panel- like what you wanna do 
              #the histogram is made in the server code and called in this code
              tabPanel("Taxonomic Representation",
-                      
+                      img(src = "beetleshiny.png"), img(src = "dipforshiny.png"), img(src = "hemipteraforshiny.png"), img(src = "hymenopteraforshiny.png"), img(src = "odonataforshiny.png"), img(src = "orthopforshiny.png"), img(src = "lepidopteraforshiny.png"),
                       sidebarLayout(
                         sidebarPanel(
                           radioButtons("order",
@@ -59,11 +59,13 @@ ui<- fluidPage(
                                          "Trichoptera"
                                        ))
                         ),
+                        
                         mainPanel(
                           plotOutput(
                             outputId ="bugplot")
                         )
                       )),
+
   ##################################################################################################################################################           
              #this is how you start a new tab
              tabPanel("Specimen Records Through Time",
@@ -83,8 +85,7 @@ ui<- fluidPage(
                         )
                       )),
 ###########################################################################################################################################  
-fluidPage(
-  titlePanel("Basic DataTable"),
+tabPanel("Basic DataTable",
   
   # Create a new Row in the UI for selectInputs
   fluidRow(
