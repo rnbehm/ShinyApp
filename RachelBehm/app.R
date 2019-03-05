@@ -164,6 +164,25 @@ server<- function(input, output) {
   })
   
   
+  function(input, output) {
+    
+    # Filter data based on selections
+    output$table <- DT::renderDataTable(DT::datatable({
+      data <- bugsimple
+      if (input$order != "All") {
+        data <- data[data$order == input$order,]
+      }
+      if (input$state != "All") {
+        data <- data[data$stateProvince == input$state,]
+      }
+      if (input$year != "All") {
+        data <- data[data$year == input$year,]
+      }
+      data
+    }))
+    
+  }
+  
 }
 
 
