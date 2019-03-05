@@ -2,9 +2,11 @@
 library(shiny)
 library(tidyverse)
 library(shinythemes)
-library(leaflet)
-library(sf)
-library(tmap)
+library(DT)
+
+
+#to have an image in your app you must firt put it in a folder called www that you make
+
 
 # get da data
 bug <- read_csv("asof252019.csv") 
@@ -34,6 +36,7 @@ ui<- fluidPage(
                       p("The Invertebrate Zoology Collection originated as a teaching collection from an entomology class taught by Dr. Adrian Wenner in the 1950's. The collection was expanded to include specimens collected by Dr. Wenner in the 1960's. After he retired during the 1980's, the collection was abandoned. In 2015, it was rediscovered and incorporated into the museum at the CCBER. The collection began to grow again from student-donated specimens from the presentday UCSB entomology and invertebrate zoology courses, accessions from the UCSB Natural Reserve System, and regional arthropod survey projects"),
                       p("The historic collection had out-of-date identifications, if any, and were coarsely organized by family. Thanks to funding from the Institute of Museum and Library Services (IMLS) and the UCSB Coastal Fund, new drawers and unit trays were purchased,  nomenclature was coarsely updated, and specimen determinations re-examined. Specimen are determined to the lowest rank possible with a focus on bees, ants, tiger beetles, and dune insects."),
                       p("Starting in April 2017, databasing the specimens began. Specimens were given a barcode that acts as a unique identifier for the specimen. Once imaged, the photo is colorcorrected, cropped, and renamed using a custom Gimp python plugin called BugFlipper, and bulk-uploaded into our Symbiota data portal."),
+                      img(src = "ccber.png"),
                       h1("Purpose of this App")
              ),
 ###############################################################################################################################################             
@@ -78,8 +81,35 @@ ui<- fluidPage(
                         mainPanel(
                           plotOutput("hist")
                         )
-                      ))
-###########################################################################################################################################             
+                      )),
+###########################################################################################################################################  
+fluidPage(
+  titlePanel("Basic DataTable"),
+  
+  # Create a new Row in the UI for selectInputs
+  fluidRow(
+    column(4,
+           selectInput("order",
+                       "order:",
+                       c("All",
+                         unique(as.character(bugsimple$order))))
+    ),
+    column(4,
+           selectInput("state",
+                       "state:",
+                       c("All",
+                         unique(as.character(bugsimple$stateProvince))))
+    ),
+    column(4,
+           selectInput("year",
+                       "Year:",
+                       c("All",
+                         unique(as.character(bugsimple$year))))
+    )
+  ),
+  # Create a new row for the table.
+  DT::dataTableOutput("table")
+)
   )
   
 )
@@ -104,15 +134,23 @@ server<- function(input, output) {
     ggplot(bugs_hist, aes(x = year)) +
       geom_histogram(fill="lightskyblue")+
       theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
+    
+    
+    
+    
+    #add images and labels of each order, maybe a little description?
+    
   })
   
   
-  year_hist <- bugsimple %>%
-    filter(year <= input$year)    
+
   
   #ggplot(year_hist, aes(x = order)) +
   #geom_histogram(fill= "blue")+
   #theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
+ 
+  year_hist <- bugsimple %>% 
+    filter(year <= as.numeric(input$hist))  
   
   ggplot(mutate(year_hist, order = fct_infreq(order))) +
     geom_bar(aes(x= order, fill = order))+
