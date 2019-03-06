@@ -170,6 +170,16 @@ year_hist <- bugsimple %>%
 ```
  
 
+```{r}
+sliderInput("integer", "Integer:",
+                  min = 0, max = 1000,
+                  value = 500),
+
+ 
+                          radioButtons("histyear", 
+                                       "Select histogram year:",
+                                       choices = c("1919","1929","1939", "1949", "1959", "1969", "1979", "1989", "1999", "2009","2019"))
+```
 
 
 # Run the application 

@@ -44,7 +44,8 @@ ui<- fluidPage(
              #histogram panel- like what you wanna do 
              #the histogram is made in the server code and called in this code
              tabPanel("Taxonomic Representation",
-                      img(src = "beetleshiny.png"), img(src = "dipforshiny.png"), img(src = "hemipteraforshiny.png"), img(src = "hymenopteraforshiny.png"), img(src = "odonataforshiny.png"), img(src = "orthopforshiny.png"), img(src = "lepidopteraforshiny.png"),
+                      #added in images and adjusted height to reasonable size
+                      img(src = "beetleshiny.png", height= 200), img(src = "dipforshiny.png", height=200), img(src = "hemipteraforshiny.png", height= 200), img(src = "hymenopteraforshiny.png", height=200), img(src = "lepidopteraforshiny.png", height=200),img(src = "odonataforshiny.png",height=200), img(src = "orthopforshiny.png", height=200), 
                       sidebarLayout(
                         sidebarPanel(
                           radioButtons("order",
@@ -74,9 +75,9 @@ ui<- fluidPage(
                       sidebarLayout(
                         sidebarPanel(
                           
-                          radioButtons("histyear", 
-                                       "Select histogram year:",
-                                       choices = c("1919","1929","1939", "1949", "1959", "1969", "1979", "1989", "1999", "2009","2019"))
+                          sliderInput("histyear", "Choose Time Frame:",
+                                      min = 1920, max = 2019,
+                                      value = 100, step = 10,sep = "")
                         ),
                         
                         # Show a plot of the generated distribution
@@ -84,6 +85,8 @@ ui<- fluidPage(
                           plotOutput("hist")
                         )
                       )),
+
+
 ###########################################################################################################################################  
 tabPanel("Basic DataTable",
   
@@ -122,7 +125,7 @@ tabPanel("Basic DataTable",
 
 server<- function(input, output) {
   
-  output$hist<- renderPlot({
+ 
  
   # Define server logic required to draw a histogram
   output$bugplot<- renderPlot({
@@ -132,38 +135,43 @@ server<- function(input, output) {
       filter(order == input$order) # Filter based on input selection from height widget
     
     #now create the graph
-    ggplot(bugs_hist, aes(x = year)) +
-      geom_histogram(fill="lightskyblue")+
-      theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
+    ggplot(bugs_hist, 
+           aes
+           (x = year)) +
+      geom_histogram(
+        fill="lightskyblue")+
+      theme_bw() +
+      labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
     
     
     
     
-    #add images and labels of each order, maybe a little description?
+    
     
   })
+  #################################################################################################################################
   
-  
-
+  output$hist<- renderPlot({
   
   #ggplot(year_hist, aes(x = order)) +
   #geom_histogram(fill= "blue")+
   #theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
  
-  year_hist <- bugsimple %>% 
-    filter(year <= as.numeric(input$hist))  
+  timedata <- bugsimple %>%
+    filter(year <= input$histyear)
   
-  ggplot(mutate(year_hist, order = fct_infreq(order))) +
-    geom_bar(aes(x= order, fill = order))+
-    theme_bw() + labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") +
-    theme(axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank(),
-          panel.background = element_rect(fill = "white", color= "black")
-    )
+  ggplot(mutate
+         (timedata, 
+           order = fct_infreq(order))) +
+    geom_bar(aes
+             (x= order, 
+               fill = order))+
+    theme_bw() + 
+    labs(x= "Order", y= "Number of Specimens", title= "Specimen Collection Events Through Time")
+  
   
   })
-  
+  #################################################################################################################################
   
   function(input, output) {
     

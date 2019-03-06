@@ -91,3 +91,20 @@ ggplot(mutate(bugsbco, family = fct_infreq(family))) +
 
 ```
 
+```{r}
+year_hist <- bugsimple %>% 
+    filter(year == "1950")  
+  
+  ggplot(mutate
+         (year_hist, 
+           order = fct_infreq(order))) +
+    geom_bar(aes
+             (x= order, 
+               fill = order))+
+    theme_bw() + 
+    labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)")
+
+  
+  
+```
+
