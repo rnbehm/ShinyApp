@@ -3,13 +3,14 @@ library(shiny)
 library(tidyverse)
 library(shinythemes)
 library(DT)
+library(ggplot2)
 
 
 #to have an image in your app you must firt put it in a folder called www that you make
 
 
 # get da data
-bug <- read_csv("asof252019.csv") 
+bug <- read_csv("asof352019.csv") 
 #wrangle the data
 bugsimple<- bug %>% 
   select(order, year, country, stateProvince, county) %>%
@@ -28,6 +29,8 @@ ui<- fluidPage(
   navbarPage("UCSB IZC",
              #this tab only has text
              tabPanel("Summary",
+                      h1("Purpose of this App"),
+                      p("This app is designed to be a user-friendly way to explore the University of California, Invertebrate Zoology Collection. The data that this app uses is from the IZC database located at www.symbiota.ccber.ucsb.edu, which is a SCAN portal." ),
                       h1("History of the Invertebrate Zoology Collection"),
                       h4("Introduction"),
                       p("The University of California, Santa Barbara (UCSB) Natural History Museum at the Cheadle Center for Biodiversity and Ecological Restoration (CCBER) has formed an Invertebrate Zoology Collection from 10,000 specimens rediscovered in a basement on campus. Since its discovery, this collection hasgrown rapidly through coastal California arthropod survey efforts, donated student collections,and faculty research projects.These surveys, conducted by CCBER for conservation and restoration monitoring, are hugely valuable as the coastal regions of Santa Barbara and Ventura County are critically endangered habitats, withover 95% of these areas lost to human disturbance, and online records about insects from these areas is presently uncommon."),
@@ -36,8 +39,8 @@ ui<- fluidPage(
                       p("The Invertebrate Zoology Collection originated as a teaching collection from an entomology class taught by Dr. Adrian Wenner in the 1950's. The collection was expanded to include specimens collected by Dr. Wenner in the 1960's. After he retired during the 1980's, the collection was abandoned. In 2015, it was rediscovered and incorporated into the museum at the CCBER. The collection began to grow again from student-donated specimens from the presentday UCSB entomology and invertebrate zoology courses, accessions from the UCSB Natural Reserve System, and regional arthropod survey projects"),
                       p("The historic collection had out-of-date identifications, if any, and were coarsely organized by family. Thanks to funding from the Institute of Museum and Library Services (IMLS) and the UCSB Coastal Fund, new drawers and unit trays were purchased,  nomenclature was coarsely updated, and specimen determinations re-examined. Specimen are determined to the lowest rank possible with a focus on bees, ants, tiger beetles, and dune insects."),
                       p("Starting in April 2017, databasing the specimens began. Specimens were given a barcode that acts as a unique identifier for the specimen. Once imaged, the photo is colorcorrected, cropped, and renamed using a custom Gimp python plugin called BugFlipper, and bulk-uploaded into our Symbiota data portal."),
-                      img(src = "ccber.png"),
-                      h1("Purpose of this App")
+                      img(src = "ccber.png", height=200)
+                      
              ),
 ###############################################################################################################################################             
              
@@ -46,6 +49,7 @@ ui<- fluidPage(
              tabPanel("Taxonomic Representation",
                       #added in images and adjusted height to reasonable size
                       img(src = "beetleshiny.png", height= 200), img(src = "dipforshiny.png", height=200), img(src = "hemipteraforshiny.png", height= 200), img(src = "hymenopteraforshiny.png", height=200), img(src = "lepidopteraforshiny.png", height=200),img(src = "odonataforshiny.png",height=200), img(src = "orthopforshiny.png", height=200), 
+                      img(src= "whiteborder.png"),
                       sidebarLayout(
                         sidebarPanel(
                           radioButtons("order",
@@ -56,8 +60,7 @@ ui<- fluidPage(
                                          "Hymenoptera",
                                          "Lepidoptera",
                                          "Odonata",
-                                         "Orthoptera",
-                                         "Trichoptera"
+                                         "Orthoptera"
                                        ))
                         ),
                         
@@ -84,36 +87,38 @@ ui<- fluidPage(
                         mainPanel(
                           plotOutput("hist")
                         )
-                      )),
+                      ))
+
 
 
 ###########################################################################################################################################  
-tabPanel("Basic DataTable",
+
+#tabPanel("Basic DataTable",
   
   # Create a new Row in the UI for selectInputs
-  fluidRow(
-    column(4,
-           selectInput("order",
-                       "order:",
-                       c("All",
-                         unique(as.character(bugsimple$order))))
-    ),
-    column(4,
-           selectInput("state",
-                       "state:",
-                       c("All",
-                         unique(as.character(bugsimple$stateProvince))))
-    ),
-    column(4,
-           selectInput("year",
-                       "Year:",
-                       c("All",
-                         unique(as.character(bugsimple$year))))
-    )
-  ),
+ # fluidRow(
+  #  column(4,
+   #        selectInput("orderdata",
+    #                   "Order:",
+     #                  c("All",
+      #                   unique(as.character(bugsimple$order))))
+    #),
+    #column(4,
+     #      selectInput("statedata",
+      #                 "State:",
+       #                c("All",
+        #                 unique(as.character(bugsimple$stateProvince))))
+    #),
+    #column(4,
+     #      selectInput("yeardata",
+      #                 "Year:",
+       #                c("All",
+        #                 unique(as.character(bugsimple$year))))
+    #)
+  #),
   # Create a new row for the table.
-  DT::dataTableOutput("table")
-)
+  #DT::dataTableOutput("table")
+#)
   )
   
 )
@@ -141,7 +146,11 @@ server<- function(input, output) {
       geom_histogram(
         fill="lightskyblue")+
       theme_bw() +
-      labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") 
+      labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") +
+      scale_y_continuous(expand=c(0,0)) +
+      theme(
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
     
     
     
@@ -165,33 +174,42 @@ server<- function(input, output) {
            order = fct_infreq(order))) +
     geom_bar(aes
              (x= order, 
-               fill = order))+
+               fill = order), show.legend = FALSE)+
     theme_bw() + 
-    labs(x= "Order", y= "Number of Specimens", title= "Specimen Collection Events Through Time")
+    labs(x= "Order", y= "Number of Specimens", title= "Specimen Collection Events Through Time")+
+    scale_y_continuous(expand=c(0,0))+
+    theme(
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
   
   
   })
   #################################################################################################################################
   
-  function(input, output) {
+  
+    #the code for the data table tab wasnt working, try again
+ # function(input, output) {
     
     # Filter data based on selections
-    output$table <- DT::renderDataTable(DT::datatable({
-      data <- bugsimple
-      if (input$order != "All") {
-        data <- data[data$order == input$order,]
-      }
-      if (input$state != "All") {
-        data <- data[data$stateProvince == input$state,]
-      }
-      if (input$year != "All") {
-        data <- data[data$year == input$year,]
-      }
-      data
-    }))
+  #  output$table <- DT::renderDataTable(DT::datatable({
+      
+   #   data <- bugsimple
+      
+    #  if (input$orderdata != "All") {
+       # data <- data[data$order== input$orderdata,]
+     # }
+      
+      #if (input$statedata != "All") {
+       # data <- data[data$stateProvince == input$statedata,]
+      #}
+      
+      #if (input$yeardata != "All") {
+       # data <- data[data$year == input$yeardata,]
+      #}
+      #data
+    #}))
     
-  }
-  
+  #}
 }
 
 
