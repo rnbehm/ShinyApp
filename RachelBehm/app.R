@@ -39,7 +39,7 @@ ui<- fluidPage(
                       h4("Introduction"),
                       p("The University of California, Santa Barbara (UCSB) Natural History Museum at the Cheadle Center for Biodiversity and Ecological Restoration (CCBER) has formed an Invertebrate Zoology Collection from 10,000 specimens rediscovered on campus in 2015. Since its discovery, this collection has grown rapidly through coastal California arthropod survey efforts, donated student collections,and faculty research projects.These surveys, conducted by CCBER for conservation and restoration monitoring, are hugely valuable as the coastal regions of Santa Barbara and Ventura County are critically endangered habitats, withover 95% of these areas lost to human disturbance, and online records about insects from these areas is presently uncommon."),
                       p("The creation of this collection has inspired new interest in entomology on campus. Undergraduate students, graduate students, and staff are learning basic entomology in newly formed classes and workshops, students are using the collection as a reference, and the inclusion of arthropods in faculty research is on the rise. The collection is providing space to voucher invertebrate research from UC Santa Barbara, and it has additional specimens and online data from our survey traps for researchers interested in California invertebrates"),
-                    
+                      HTML('<center><img src="monarch.jpg" width="700"></center>'),                    
                       
                       h4("Background / Revitilazation Process"),
                       p("The Invertebrate Zoology Collection originated as a teaching collection from an entomology class taught by Dr. Adrian Wenner in the 1950's. The collection was expanded to include specimens collected by Dr. Wenner in the 1960's. After he retired during the 1980's, the collection was abandoned. In 2015, it was rediscovered and incorporated into the museum at the CCBER. The collection began to grow again from student-donated specimens from the presentday UCSB entomology and invertebrate zoology courses, accessions from the UCSB Natural Reserve System, and regional arthropod survey projects"),
@@ -50,7 +50,7 @@ ui<- fluidPage(
                       
   h1("Sources and Resources"),
   h4("Ownership and Access"),
-  p("This application was designed and created by graduate student, Rachel Behm in winter quarter 2019 for the final assignment of Advanced Data Science (ESM244). All of the code is open and accesible on GitHub via https://github.com/rnbehm/ShinyApp."),
+  p("This application was designed and created by graduate student, Rachel Behm in winter quarter 2019 for the final assignment of Advanced Data Science (ESM244). All of the code is open and accesible on GitHub via https://github.com/rnbehm/ShinyApp. The last file update was March 5th 2019."),
   h4("External Resources"),
   p("Cheadle Center For Biodiversity and Ecological Restoration (CCBER): "),
   p("https://www.ccber.ucsb.edu/"),
@@ -86,7 +86,11 @@ ui<- fluidPage(
                                          "Lepidoptera",
                                          "Odonata",
                                          "Orthoptera"
-                                       ))
+                                       )),
+                          
+                          selectInput("color", 
+                                      "Select histogram color:",
+                                      choices = c("lightskyblue","coral1","blueviolet", "darkgray","darkseagreen", "palevioletred1"))
                         ),
                         
                         mainPanel(
@@ -106,8 +110,15 @@ ui<- fluidPage(
                           
                           sliderInput("histyear", "Choose Time Frame:",
                                       min = 1920, max = 2019,
-                                      value = 100, step = 10,sep = "")
+                                      value = 100, step = 5,sep = ""),
+                          
+                          selectInput("color2", 
+                                      "Select histogram color:",
+                                      choices = c("lightskyblue","coral1","blueviolet", "darkgray","darkseagreen", "palevioletred1"))
+                          
+
                         ),
+                        
                         
                         # Show a plot of the generated distribution
                         mainPanel(
@@ -170,7 +181,7 @@ server<- function(input, output) {
            aes
            (x = year)) +
       geom_histogram(
-        fill="lightskyblue")+
+        fill = input$color)+
       theme_bw() +
       labs(x= "Year Collected", y= "Number of Specimens", title= "Specimen Collection Events in the Last 100 Years (1919-2019)") +
       scale_y_continuous(expand=c(0,0)) +
@@ -200,7 +211,7 @@ server<- function(input, output) {
            order = fct_infreq(order))) +
     geom_bar(aes
              (x= order), 
-             fill = "lightskyblue", show.legend = FALSE)+
+             fill = input$color2, show.legend = FALSE)+
     theme_bw() + 
     labs(x= "Order", y= "Number of Specimens", title= "Specimen Collection Events Through Time")+
     scale_y_continuous(expand=c(0,0))+
