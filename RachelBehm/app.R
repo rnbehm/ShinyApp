@@ -30,16 +30,22 @@ ui<- fluidPage(
              tabPanel("Summary",
                       h1("Purpose of this App"),
                       p("This app is designed to be a user-friendly way to explore the University of California, Invertebrate Zoology Collection. The data that this app uses is from the IZC database located at www.symbiota.ccber.ucsb.edu, which is a SCAN portal. While the portal itself is publicly accessible, it can be difficult for the average user to navigate and explore the data. The database is being constantly updated thanks to the hard and diligent work of CCBER's staff and interns, and can easily be updated by replacing the csv file in the code with an updated one that can be downloaded from the database." ),
+                      
+                      
                       HTML('<center><img src="symbiota.png" height="350"></center>'),
-                      h4("Tab 2:Taxonomic Representation"),
+                      
                       p("The widget in this tab allows the user to explore the specimen occurences within the IZC database by taxonomy. The radio buttons allow for choosing the specific order of insect which will change the output of the graph to show that order."),
                       h4("Tab 3: Specimen Records Through Time"),
                       p("The widget in this tab allows the user to explore the specimen occurences within the IZC database through time. The slider allows the user to adjust the timeframe to see how the collection grows by decade."),
                       h1("History of the Invertebrate Zoology Collection"),
                       h4("Introduction"),
                       p("The University of California, Santa Barbara (UCSB) Natural History Museum at the Cheadle Center for Biodiversity and Ecological Restoration (CCBER) has formed an Invertebrate Zoology Collection from 10,000 specimens rediscovered on campus in 2015. Since its discovery, this collection has grown rapidly through coastal California arthropod survey efforts, donated student collections,and faculty research projects.These surveys, conducted by CCBER for conservation and restoration monitoring, are hugely valuable as the coastal regions of Santa Barbara and Ventura County are critically endangered habitats, withover 95% of these areas lost to human disturbance, and online records about insects from these areas is presently uncommon."),
+                      img(src ="drawerbefore.jpg", height=250),
+                      img(src="thyreodons.jpg", width=500, height= 300),
+                      img(src = "drawerafter2.jpg", height=250),
                       p("The creation of this collection has inspired new interest in entomology on campus. Undergraduate students, graduate students, and staff are learning basic entomology in newly formed classes and workshops, students are using the collection as a reference, and the inclusion of arthropods in faculty research is on the rise. The collection is providing space to voucher invertebrate research from UC Santa Barbara, and it has additional specimens and online data from our survey traps for researchers interested in California invertebrates"),
-                      HTML('<center><img src="monarch.jpg" width="700"></center>'),                    
+                      HTML('<center><img src="monarch.jpg" width="800"></center>'),  
+                      
                       
                       h4("Background / Revitilazation Process"),
                       p("The Invertebrate Zoology Collection originated as a teaching collection from an entomology class taught by Dr. Adrian Wenner in the 1950's. The collection was expanded to include specimens collected by Dr. Wenner in the 1960's. After he retired during the 1980's, the collection was abandoned. In 2015, it was rediscovered and incorporated into the museum at the CCBER. The collection began to grow again from student-donated specimens from the presentday UCSB entomology and invertebrate zoology courses, accessions from the UCSB Natural Reserve System, and regional arthropod survey projects"),
@@ -91,6 +97,8 @@ ui<- fluidPage(
                           selectInput("color", 
                                       "Select histogram color:",
                                       choices = c("lightskyblue","coral1","blueviolet", "darkgray","darkseagreen", "palevioletred1"))
+                   
+                              
                         ),
                         
                         mainPanel(
@@ -175,7 +183,7 @@ server<- function(input, output) {
     # Creating the reactive output
     bugs_hist <- bugsimple %>% 
       filter(order == input$order) # Filter based on input selection from height widget
-    
+   
     #now create the graph
     ggplot(bugs_hist, 
            aes
